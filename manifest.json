@@ -1,0 +1,30 @@
+{
+  "manifest_version": 2,
+  "name": "BSummarize",
+  "version": "1.0.0",
+  "description": "BSummarize: A free Firefox extension that summarizes and translates web pages using Gemini and open-source language models like Llama3, Mistral, and Gemma. Customizable settings, YouTube caption support, and intelligent chunking for long text. Enhance your browsing experience and save time!",
+  "default_locale": "en",
+  "icons": {
+    "128": "img/icon-128.png"
+  },
+  "author": "contact@balakumar.dev",
+  "browser_action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "scripts": ["service-worker.js"]
+  },
+  "options_ui": {
+    "page": "options.html"
+  },
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["lib/Readability.min.js"]
+    }
+  ]
+}

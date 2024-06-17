@@ -1,0 +1,107 @@
+{
+    "extension_name": {
+        "message": "Резюме и перевод с помощью Gemini"
+    },
+    "extension_description": {
+        "message": "Резюмируйте и переводите веб-страницы. Использует Gemini в качестве бэкэнда."
+    },
+    "popup_button_run": {
+        "message": "Запустить снова"
+    },
+    "popup_button_results": {
+        "message": "Открыть результаты в новой вкладке"
+    },
+    "popup_button_options": {
+        "message": "Открыть страницу настроек"
+    },
+    "popup_summarizing": {
+        "message": "Резюмирование"
+    },
+    "popup_summarizing_captions": {
+        "message": "Резюмирование субтитров"
+    },
+    "popup_summarizing_image": {
+        "message": "Резюмирование изображения"
+    },
+    "popup_translating": {
+        "message": "Перевод"
+    },
+    "popup_translating_captions": {
+        "message": "Перевод субтитров"
+    },
+    "popup_translating_image": {
+        "message": "Перевод изображения"
+    },
+    "popup_processing": {
+        "message": "Обработка"
+    },
+    "popup_prompt_blocked": {
+        "message": "Запрос был заблокирован."
+    },
+    "popup_response_blocked": {
+        "message": "Ответ был заблокирован."
+    },
+    "popup_unexpected_response": {
+        "message": "Произошла неизвестная ошибка. Проверьте журнал консоли."
+    },
+    "popup_miscellaneous_error": {
+        "message": "Эта страница не может быть резюмирована или переведена."
+    },
+    "results_title": {
+        "message": "Результаты - Резюме и перевод с помощью Gemini"
+    },
+    "results_button_copy": {
+        "message": "Копировать"
+    },
+    "results_copied": {
+        "message": "Скопировано."
+    },
+    "options_title": {
+        "message": "Настройки - Резюме и перевод с помощью Gemini"
+    },
+    "options_apikey": {
+        "message": "Ключ API Gemini"
+    },
+    "options_apikey_hint": {
+        "message": "Вы можете получить ключ API Gemini на следующей странице."
+    },
+    "options_model": {
+        "message": "Языковая модель"
+    },
+    "options_language": {
+        "message": "Резюмировать на / Перевести на"
+    },
+    "options_language_notes": {
+        "message": "Настройка языка игнорируется в пользовательских действиях."
+    },
+    "options_no_text_action": {
+        "message": "Когда текст не выбран, выполните следующее действие"
+    },
+    "options_no_text_summarize": {
+        "message": "Резюмировать (по умолчанию)"
+    },
+    "options_no_text_translate": {
+        "message": "Перевести"
+    },
+    "options_no_text_custom": {
+        "message": "Пользовательское действие"
+    },
+    "options_text_action": {
+        "message": "Когда текст выбран, выполните следующее действие"
+    },
+    "options_text_summarize": {
+        "message": "Резюмировать"
+    },
+    "options_text_translate": {
+        "message": "Перевести (по умолчанию)"
+    },
+    "options_text_custom": {
+        "message": "Пользовательское действие"
+    },
+    "options_button_save": {
+        "message": "Сохранить настройки"
+    },
+    "options_saved": {
+        "message": "Сохранено."
+    }
+}

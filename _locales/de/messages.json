@@ -1,0 +1,107 @@
+{
+    "extension_name": {
+        "message": "Zusammenfassen und Übersetzen mit Gemini"
+    },
+    "extension_description": {
+        "message": "Zusammenfassen und Übersetzen von Webseiten. Verwendet Gemini als Backend."
+    },
+    "popup_button_run": {
+        "message": "Nochmal ausführen"
+    },
+    "popup_button_results": {
+        "message": "Ergebnisse in einem neuen Tab öffnen"
+    },
+    "popup_button_options": {
+        "message": "Optionen-Seite öffnen"
+    },
+    "popup_summarizing": {
+        "message": "Zusammenfassen"
+    },
+    "popup_summarizing_captions": {
+        "message": "Zusammenfassen der Untertitel"
+    },
+    "popup_summarizing_image": {
+        "message": "Zusammenfassen des Bildes"
+    },
+    "popup_translating": {
+        "message": "Übersetzen"
+    },
+    "popup_translating_captions": {
+        "message": "Übersetzen der Untertitel"
+    },
+    "popup_translating_image": {
+        "message": "Übersetzen des Bildes"
+    },
+    "popup_processing": {
+        "message": "Verarbeiten"
+    },
+    "popup_prompt_blocked": {
+        "message": "Die Aufforderung wurde blockiert."
+    },
+    "popup_response_blocked": {
+        "message": "Die Antwort wurde blockiert."
+    },
+    "popup_unexpected_response": {
+        "message": "Ein unbekannter Fehler ist aufgetreten. Bitte überprüfen Sie das Konsolenprotokoll."
+    },
+    "popup_miscellaneous_error": {
+        "message": "Diese Seite kann nicht zusammengefasst oder übersetzt werden."
+    },
+    "results_title": {
+        "message": "Ergebnisse - Zusammenfassen und Übersetzen mit Gemini"
+    },
+    "results_button_copy": {
+        "message": "Kopieren"
+    },
+    "results_copied": {
+        "message": "Kopiert."
+    },
+    "options_title": {
+        "message": "Optionen - Zusammenfassen und Übersetzen mit Gemini"
+    },
+    "options_apikey": {
+        "message": "Gemini API-Schlüssel"
+    },
+    "options_apikey_hint": {
+        "message": "Sie können einen Gemini API-Schlüssel auf der folgenden Seite erhalten."
+    },
+    "options_model": {
+        "message": "Sprachmodell"
+    },
+    "options_language": {
+        "message": "Zusammenfassen in / Übersetzen in"
+    },
+    "options_language_notes": {
+        "message": "Die Spracheinstellung wird bei benutzerdefinierten Aktionen ignoriert."
+    },
+    "options_no_text_action": {
+        "message": "Wenn kein Text ausgewählt ist, führe die folgende Aktion aus"
+    },
+    "options_no_text_summarize": {
+        "message": "Zusammenfassen (Standard)"
+    },
+    "options_no_text_translate": {
+        "message": "Übersetzen"
+    },
+    "options_no_text_custom": {
+        "message": "Benutzerdefinierte Aktion"
+    },
+    "options_text_action": {
+        "message": "Wenn Text ausgewählt ist, führe die folgende Aktion aus"
+    },
+    "options_text_summarize": {
+        "message": "Zusammenfassen"
+    },
+    "options_text_translate": {
+        "message": "Übersetzen (Standard)"
+    },
+    "options_text_custom": {
+        "message": "Benutzerdefinierte Aktion"
+    },
+    "options_button_save": {
+        "message": "Optionen speichern"
+    },
+    "options_saved": {
+        "message": "Gespeichert."
+    }
+}

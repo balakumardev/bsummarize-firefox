@@ -1,0 +1,107 @@
+{
+    "extension_name": {
+        "message": "Riassumi e Traduci con Gemini"
+    },
+    "extension_description": {
+        "message": "Riassumi e traduci pagine web. Utilizza Gemini come backend."
+    },
+    "popup_button_run": {
+        "message": "Esegui di nuovo"
+    },
+    "popup_button_results": {
+        "message": "Apri i risultati in una nuova scheda"
+    },
+    "popup_button_options": {
+        "message": "Apri la pagina delle opzioni"
+    },
+    "popup_summarizing": {
+        "message": "Riassunto in corso"
+    },
+    "popup_summarizing_captions": {
+        "message": "Riassunto delle didascalie"
+    },
+    "popup_summarizing_image": {
+        "message": "Riassunto dell'immagine"
+    },
+    "popup_translating": {
+        "message": "Traduzione in corso"
+    },
+    "popup_translating_captions": {
+        "message": "Traduzione delle didascalie"
+    },
+    "popup_translating_image": {
+        "message": "Traduzione dell'immagine"
+    },
+    "popup_processing": {
+        "message": "Elaborazione"
+    },
+    "popup_prompt_blocked": {
+        "message": "Il prompt è stato bloccato."
+    },
+    "popup_response_blocked": {
+        "message": "La risposta è stata bloccata."
+    },
+    "popup_unexpected_response": {
+        "message": "Si è verificato un errore sconosciuto. Controllare il registro della console."
+    },
+    "popup_miscellaneous_error": {
+        "message": "Questa pagina non può essere riassunta o tradotta."
+    },
+    "results_title": {
+        "message": "Risultati - Riassumi e Traduci con Gemini"
+    },
+    "results_button_copy": {
+        "message": "Copia"
+    },
+    "results_copied": {
+        "message": "Copiato."
+    },
+    "options_title": {
+        "message": "Opzioni - Riassumi e Traduci con Gemini"
+    },
+    "options_apikey": {
+        "message": "Chiave API Gemini"
+    },
+    "options_apikey_hint": {
+        "message": "È possibile ottenere una chiave API Gemini alla seguente pagina."
+    },
+    "options_model": {
+        "message": "Modello linguistico"
+    },
+    "options_language": {
+        "message": "Riassumi in / Traduci in"
+    },
+    "options_language_notes": {
+        "message": "L'impostazione della lingua viene ignorata nelle azioni personalizzate."
+    },
+    "options_no_text_action": {
+        "message": "Quando non è selezionato alcun testo, esegui la seguente azione"
+    },
+    "options_no_text_summarize": {
+        "message": "Riassumi (predefinito)"
+    },
+    "options_no_text_translate": {
+        "message": "Traduci"
+    },
+    "options_no_text_custom": {
+        "message": "Azione personalizzata"
+    },
+    "options_text_action": {
+        "message": "Quando è selezionato del testo, esegui la seguente azione"
+    },
+    "options_text_summarize": {
+        "message": "Riassumi"
+    },
+    "options_text_translate": {
+        "message": "Traduci (predefinito)"
+    },
+    "options_text_custom": {
+        "message": "Azione personalizzata"
+    },
+    "options_button_save": {
+        "message": "Salva opzioni"
+    },
+    "options_saved": {
+        "message": "Salvato."
+    }
+}
