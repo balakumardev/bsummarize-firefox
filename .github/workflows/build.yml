@@ -1,0 +1,32 @@
+name: Build Extension
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          npm install web-ext
+
+      - name: Increment version number
+        run: |
+          current_version=$(grep -oP '(?<="version": ")[^"]*' manifest.json)
+          new_version=$(echo $current_version | awk -F. '/[0-9]+\./{$NF++;print}' OFS=.)
+          sed -i "s/\"version\": \"$current_version\"/\"version\": \"$new_version\"/" manifest.json
+
+      - name: Build extension
+        run: |
+          web-ext build
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: bsummarize
+          path: web-ext-artifacts/*.zip
