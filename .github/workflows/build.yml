@@ -3,6 +3,12 @@ name: Build Extension
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      create_release:
+        description: 'Create a new release'
+        required: true
+        default: 'false'
 
 jobs:
   build:
@@ -12,17 +18,45 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Increment version number
+        if: github.event.inputs.create_release == 'true'
         run: |
           current_version=$(grep -oP '(?<="version": ")[^"]*' manifest.json)
           new_version=$(echo $current_version | awk -F. '/[0-9]+\./{$NF++;print}' OFS=.)
           sed -i "s/\"version\": \"$current_version\"/\"version\": \"$new_version\"/" manifest.json
+          echo "NEW_VERSION=$new_version" >> $GITHUB_ENV
+
+      - name: Commit version update
+        if: github.event.inputs.create_release == 'true'
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git add manifest.json
+          git commit -m "Bump version to ${{ env.NEW_VERSION }}"
+          git push
 
       - name: Build extension
         run: |
           zip -r bsummarize.xpi *
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v2
+      - name: Create release
+        if: github.event.inputs.create_release == 'true'
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: bsummarize
-          path: bsummarize.xpi
+          tag_name: v${{ env.NEW_VERSION }}
+          release_name: Release v${{ env.NEW_VERSION }}
+          draft: false
+          prerelease: false
+
+      - name: Upload release asset
+        if: github.event.inputs.create_release == 'true'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: bsummarize.xpi
+          asset_name: bsummarize-v${{ env.NEW_VERSION }}.xpi
+          asset_content_type: application/zip
