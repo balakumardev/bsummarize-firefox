@@ -1,6 +1,6 @@
 {
     "extension_name": {
-        "message": "تلخيص وترجمة باستخدام Gemini"
+        "message": "تلخيص وترجمة باستخدام BHelper"
     },
     "extension_description": {
         "message": "تلخيص وترجمة صفحات الويب. يستخدم Gemini كخلفية."
@@ -48,7 +48,7 @@
         "message": "لا يمكن تلخيص أو ترجمة هذه الصفحة."
     },
     "results_title": {
-        "message": "النتائج - تلخيص وترجمة باستخدام Gemini"
+        "message": "النتائج - تلخيص وترجمة باستخدام BHelper"
     },
     "results_button_copy": {
         "message": "نسخ"
@@ -57,10 +57,10 @@
         "message": "تم النسخ."
     },
     "options_title": {
-        "message": "الخيارات - تلخيص وترجمة باستخدام Gemini"
+        "message": "الخيارات - تلخيص وترجمة باستخدام BHelper"
     },
     "options_apikey": {
-        "message": "مفتاح API لـ Gemini"
+        "message": "مفتاح API لـ BHelper"
     },
     "options_apikey_hint": {
         "message": "يمكنك الحصول على مفتاح API لـ Gemini من الصفحة التالية."

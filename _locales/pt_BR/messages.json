@@ -1,6 +1,6 @@
 {
     "extension_name": {
-        "message": "Resumir e Traduzir com Gemini"
+        "message": "Resumir e Traduzir com BHelper"
     },
     "extension_description": {
         "message": "Resuma e traduza páginas da web. Utiliza Gemini como backend."
@@ -48,7 +48,7 @@
         "message": "Esta página não pode ser resumida ou traduzida."
     },
     "results_title": {
-        "message": "Resultados - Resumir e Traduzir com Gemini"
+        "message": "Resultados - Resumir e Traduzir com BHelper"
     },
     "results_button_copy": {
         "message": "Copiar"
@@ -57,10 +57,10 @@
         "message": "Copiado."
     },
     "options_title": {
-        "message": "Opções - Resumir e Traduzir com Gemini"
+        "message": "Opções - Resumir e Traduzir com BHelper"
     },
     "options_apikey": {
-        "message": "Chave da API Gemini"
+        "message": "Chave da API BHelper"
     },
     "options_apikey_hint": {
         "message": "Você pode obter uma chave da API Gemini na seguinte página."

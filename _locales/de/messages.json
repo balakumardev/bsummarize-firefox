@@ -1,6 +1,6 @@
 {
     "extension_name": {
-        "message": "Zusammenfassen und Übersetzen mit Gemini"
+        "message": "Zusammenfassen und Übersetzen mit BHelper"
     },
     "extension_description": {
         "message": "Zusammenfassen und Übersetzen von Webseiten. Verwendet Gemini als Backend."
@@ -48,7 +48,7 @@
         "message": "Diese Seite kann nicht zusammengefasst oder übersetzt werden."
     },
     "results_title": {
-        "message": "Ergebnisse - Zusammenfassen und Übersetzen mit Gemini"
+        "message": "Ergebnisse - Zusammenfassen und Übersetzen mit BHelper"
     },
     "results_button_copy": {
         "message": "Kopieren"
@@ -57,7 +57,7 @@
         "message": "Kopiert."
     },
     "options_title": {
-        "message": "Optionen - Zusammenfassen und Übersetzen mit Gemini"
+        "message": "Optionen - Zusammenfassen und Übersetzen mit BHelper"
     },
     "options_apikey": {
         "message": "Gemini API-Schlüssel"

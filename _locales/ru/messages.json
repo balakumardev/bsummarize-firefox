@@ -1,6 +1,6 @@
 {
     "extension_name": {
-        "message": "Резюме и перевод с помощью Gemini"
+        "message": "Резюме и перевод с помощью BHelper"
     },
     "extension_description": {
         "message": "Резюмируйте и переводите веб-страницы. Использует Gemini в качестве бэкэнда."
@@ -48,7 +48,7 @@
         "message": "Эта страница не может быть резюмирована или переведена."
     },
     "results_title": {
-        "message": "Результаты - Резюме и перевод с помощью Gemini"
+        "message": "Результаты - Резюме и перевод с помощью BHelper"
     },
     "results_button_copy": {
         "message": "Копировать"
@@ -57,10 +57,10 @@
         "message": "Скопировано."
     },
     "options_title": {
-        "message": "Настройки - Резюме и перевод с помощью Gemini"
+        "message": "Настройки - Резюме и перевод с помощью BHelper"
     },
     "options_apikey": {
-        "message": "Ключ API Gemini"
+        "message": "Ключ API BHelper"
     },
     "options_apikey_hint": {
         "message": "Вы можете получить ключ API Gemini на следующей странице."

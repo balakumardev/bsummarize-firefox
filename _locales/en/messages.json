@@ -1,9 +1,9 @@
 {
     "extension_name": {
-        "message": "Summarize and Translate with Gemini"
+        "message": "Summarize and Translate with BSummarize"
     },
     "extension_description": {
-        "message": "Summarize and translate web pages. Uses Gemini as the backend."
+        "message": "Summarize and translate web pages. Uses Gemini / Ollama as the backend."
     },
     "popup_button_run": {
         "message": "Run it again"
@@ -48,7 +48,7 @@
         "message": "This page cannot be summarized or translated."
     },
     "results_title": {
-        "message": "Results - Summarize and Translate with Gemini"
+        "message": "Results - Summarize and Translate with BHelper"
     },
     "results_button_copy": {
         "message": "Copy"
@@ -57,7 +57,7 @@
         "message": "Copied."
     },
     "options_title": {
-        "message": "Options - Summarize and Translate with Gemini"
+        "message": "Options - Summarize and Translate with BHelper"
     },
     "options_apikey": {
         "message": "Gemini API Key"
