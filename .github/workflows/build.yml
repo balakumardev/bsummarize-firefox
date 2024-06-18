@@ -6,14 +6,14 @@ on:
       - main
 
 jobs:
-  build-and-package:  # Correctly define the job
+  build-and-package:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
       - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
+        run: sudo apt-get update && sudo apt-get install -y jq zip
 
       - name: Set up Node.js 20
         uses: actions/setup-node@v3
@@ -32,29 +32,32 @@ jobs:
 
       - name: Increment Version
         id: increment-version
-        uses: ashley-taylor/read-json-property-action@v1
+        uses: actions/github-script@v6
         with:
-          path: ./manifest.json
-          property: version
+          script: |
+            const manifest = require('./manifest.json');
+            const currentVersion = manifest.version;
+            const versionParts = currentVersion.split('.');
+            versionParts[2] = parseInt(versionParts[2], 10) + 1;
+            const newVersion = versionParts.join('.');
+            core.setOutput('new-version', newVersion);
 
       - name: Update Manifest Version
         run: |
-          echo "New version: ${{ steps.increment-version.outputs.value }}"
-          jq --arg newVersion "${{ steps.increment-version.outputs.value }}" '.version = $newVersion' manifest.json > manifest.tmp.json && mv manifest.tmp.json manifest.json
+          echo "New version: ${{ steps.increment-version.outputs.new-version }}"
+          jq --arg newVersion "${{ steps.increment-version.outputs.new-version }}" '.version = $newVersion' manifest.json > manifest.tmp.json && mv manifest.tmp.json manifest.json
         working-directory: ./
 
       - name: Package Extension
-        uses: mozilla/web-ext@8.1.0
-        with:
-          sourceDir: ./
-          artifactsDir: ./artifacts
-          overwriteDest: true
+        run: |
+          zip -r bsummarize-extension.zip * -x ".*" -x "artifacts/*"
+        working-directory: ./
 
       - name: Upload Extension Artifact
         uses: actions/upload-artifact@v3
         with:
           name: bsummarize-extension
-          path: ./artifacts/*.xpi
+          path: ./bsummarize-extension.zip
 
   create-release:
     needs: build-and-package
@@ -71,8 +74,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ steps.increment-version.outputs.value }}
-          release_name: BSummarize Release v${{ steps.increment-version.outputs.value }}
+          tag_name: v${{ needs.build-and-package.outputs.new-version }}
+          release_name: BSummarize Release v${{ needs.build-and-package.outputs.new-version }}
           draft: false
           prerelease: false
 
@@ -81,7 +84,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/*.xpi
-          asset_name: bsummarize-${{ steps.increment-version.outputs.value }}.xpi
-          asset_content_type: application/x-xpinstall
+          upload_url: ${{ steps.create-release.outputs.upload_url }}
+          asset_path: ./bsummarize-extension.zip
+          asset_name: bsummarize-${{ needs.build-and-package.outputs.new-version }}.zip
+          asset_content_type: application/zip
