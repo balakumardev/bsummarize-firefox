@@ -44,7 +44,7 @@ jobs:
         working-directory: ./
 
       - name: Package Extension
-        uses: mozilla/web-ext@v8.1.0
+        uses: mozilla/web-ext@8.1.0
         with:
           sourceDir: ./
           artifactsDir: ./artifacts
