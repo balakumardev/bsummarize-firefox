@@ -1,4 +1,4 @@
-name: Build and Release Firefox Extension
+name: Build and Release BSummarize
 
 on:
   push:
@@ -6,68 +6,36 @@ on:
       - main
 
 jobs:
-  build:
+  build-and-package:
+  # ... (this job remains unchanged)
+
+  create-release:
+    needs: build-and-package
     runs-on: ubuntu-latest
-
+    # No need for permissions block here anymore!
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Download Extension Artifact
+        uses: actions/download-artifact@v3
         with:
-          fetch-depth: 0
+          name: bsummarize-extension
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y zip
-
-      - name: Read extension version
-        id: extension_version
-        run: |
-          version=$(grep -oP '"version"\s*:\s*"\K[^"]+' manifest.json)
-          echo "current_version=$version" >> $GITHUB_OUTPUT
-
-      - name: Package extension
-        run: |
-          zip -r extension.zip * -x ".git/*" ".github/*"
-
-      - name: Create release
-        id: create_release
+      - name: Create Release
+        id: create-release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ steps.extension_version.outputs.current_version }}
-          release_name: Release v${{ steps.extension_version.outputs.current_version }}
+          tag_name: v${{ steps.increment-version.outputs.value }}
+          release_name: BSummarize Release v${{ steps.increment-version.outputs.value }}
           draft: false
           prerelease: false
 
-      - name: Upload extension to release
+      - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./extension.zip
-          asset_name: extension-v${{ steps.extension_version.outputs.current_version }}.zip
-          asset_content_type: application/zip
-
-      - name: Update manifest version
-        run: |
-          current_version=${{ steps.extension_version.outputs.current_version }}
-          major=$(echo $current_version | cut -d '.' -f 1)
-          minor=$(echo $current_version | cut -d '.' -f 2)
-          patch=$(echo $current_version | cut -d '.' -f 3)
-          next_patch=$((patch + 1))
-          next_version="$major.$minor.$next_patch"
-          sed -i "s/\"version\": \"$current_version\"/\"version\": \"$next_version\"/" manifest.json
-
-      - name: Commit updated manifest
-        uses: EndBug/add-and-commit@v9
-        with:
-          message: 'Update manifest version to ${{ steps.extension_version.outputs.current_version }}'
-          add: 'manifest.json'
+          asset_path: ./artifacts/*.xpi
+          asset_name: bsummarize-${{ steps.increment-version.outputs.value }}.xpi
+          asset_content_type: application/x-xpinstall
