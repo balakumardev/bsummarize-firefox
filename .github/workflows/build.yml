@@ -60,7 +60,7 @@ jobs:
     needs: build-and-package
     runs-on: ubuntu-latest
     permissions:
-      releases: write
+      # Corrected: part of key-value pair
     steps:
       - name: Download Extension Artifact
         uses: actions/download-artifact@v3
