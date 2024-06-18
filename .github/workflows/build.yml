@@ -101,5 +101,5 @@ jobs:
           name: BSummarize Release v${{ steps.read-version.outputs.new-version }}
           draft: false
           prerelease: false
-          files: ./bsummarize.xpi
+          files: bsummarize.xpi
           token: ${{ secrets.TOKEN }}
