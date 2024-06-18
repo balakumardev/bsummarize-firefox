@@ -69,7 +69,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: bsummarize-extension
-          path: ./bsummarize.xpi
+          path: ./web-ext-artifacts/bsummarize.xpi
 
   create-release:
     needs: build-and-package
