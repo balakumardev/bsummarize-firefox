@@ -55,38 +55,60 @@ jobs:
         run: web-ext build --overwrite-dest --filename=bsummarize.xpi
         working-directory: ./
 
+      - name: Save Version to File
+        run: echo "${{ steps.increment-version.outputs.new-version }}" > new_version.txt
+        working-directory: ./
+
+      - name: Upload Version Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: version-artifact
+          path: ./new_version.txt
+
       - name: Upload Extension Artifact
         uses: actions/upload-artifact@v3
         with:
           name: bsummarize-extension
-          path: ./web-ext-artifacts/*.xpi
+          path: ./bsummarize.xpi
 
   create-release:
     needs: build-and-package
     runs-on: ubuntu-latest
     steps:
+      - name: Download Version Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: version-artifact
+
+      - name: Read Version from File
+        id: read-version
+        run: |
+          NEW_VERSION=$(cat new_version.txt)
+          echo "::set-output name=new-version::$NEW_VERSION"
+
       - name: Download Extension Artifact
         uses: actions/download-artifact@v3
         with:
           name: bsummarize-extension
+          path: ./
 
       - name: Create Release
         id: create-release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ needs.build-and-package.outputs.new-version }}
-          release_name: BSummarize Release v${{ needs.build-and-package.outputs.new-version }}
+          tag_name: v${{ steps.read-version.outputs.new-version }}
+          release_name: BSummarize Release v${{ steps.read-version.outputs.new-version }}
           draft: false
           prerelease: false
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
-          asset_path: ./*.xpi
-          asset_name: bsummarize-${{ needs.build-and-package.outputs.new-version }}.xpi
+          asset_path: ./bsummarize.xpi
+          asset_name: bsummarize-${{ steps.read-version.outputs.new-version }}.xpi
           asset_content_type: application/x-xpinstall
