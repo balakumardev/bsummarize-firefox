@@ -92,21 +92,28 @@ jobs:
           name: bsummarize-extension
           path: ./bsummarize.xpi
 
-      - name: Create Release
-        id: create-release
-        uses: actions/create-release@v1
+      - name: Create a Release
+        uses: elgohr/Github-Release-Action@v5
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.TOKEN }}
         with:
-          tag_name: v${{ steps.read-version.outputs.new-version }}
-          release_name: BSummarize Release v${{ steps.read-version.outputs.new-version }}
-          draft: false
-          prerelease: false
+          title: BSummarize Release v${{ steps.read-version.outputs.new-version }}
+
+#      - name: Create Release
+#        id: create-release
+#        uses: actions/create-release@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          tag_name: v${{ steps.read-version.outputs.new-version }}
+#          release_name: BSummarize Release v${{ steps.read-version.outputs.new-version }}
+#          draft: false
+#          prerelease: false
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
           asset_path: ./bsummarize.xpi
