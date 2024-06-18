@@ -59,9 +59,12 @@ jobs:
           git commit -m "Bump version to ${{ steps.increment-version.outputs.new-version }}"
           git push
         working-directory: ./
+      - name: Lint Extension
+        run: web-ext lint
+        working-directory: ./
 
       - name: Package Extension
-        run: web-ext build --overwrite-dest --filename=bsummarize.xpi
+        run: web-ext build --overwrite-dest --filename=bsummarize.xpi --verbose
         working-directory: ./
 
       - name: Save Version to File
