@@ -101,26 +101,5 @@ jobs:
           name: BSummarize Release v${{ steps.read-version.outputs.new-version }}
           draft: false
           prerelease: false
-          files: ./web-ext-artifacts/bsummarize.xpi
+          files: ./bsummarize.xpi
           token: ${{ secrets.TOKEN }}
-
-#      - name: Create Release
-#        id: create-release
-#        uses: actions/create-release@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          tag_name: v${{ steps.read-version.outputs.new-version }}
-#          release_name: BSummarize Release v${{ steps.read-version.outputs.new-version }}
-#          draft: false
-#          prerelease: false
-
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
-        with:
-          upload_url: ${{ steps.create-release.outputs.upload_url }}
-          asset_path: ./bsummarize.xpi
-          asset_name: bsummarize-${{ steps.read-version.outputs.new-version }}.xpi
-          asset_content_type: application/x-xpinstall
