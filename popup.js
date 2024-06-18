@@ -2,23 +2,16 @@
 
 let contentIndex = 0;
 
-const getSelectedText = () => {
-  return window.getSelection().toString();
-};
+const getSelectedText = () => window.getSelection().toString();
 
 const getWholeText = () => {
   const documentClone = document.cloneNode(true);
   const article = new Readability(documentClone).parse();
 
-  if (article) {
-    return article.textContent;
-  } else {
-    console.log("Failed to parse the article. Using document.body.innerText instead.");
-    return document.body.innerText;
-  }
+  return article ? article.textContent : document.body.innerText;
 };
 
-const getCaptions = async (videoUrl, languageCode) => {
+const fetchCaptions = async (videoUrl, languageCode) => {
   const languageCodeMap = {
     en: 'en',
     de: 'de',
@@ -43,7 +36,6 @@ const getCaptions = async (videoUrl, languageCode) => {
   try {
     const response = await fetch(apiUrl);
     const html = await response.text();
-
     const captionsData = html.match(/"captions":(\{.*?\}),/s);
 
     if (captionsData) {
@@ -52,9 +44,7 @@ const getCaptions = async (videoUrl, languageCode) => {
 
       if (captionTracks) {
         const preferredLanguages = [languageCodeMap[languageCode], 'en'];
-        const track = captionTracks.find(track =>
-            preferredLanguages.includes(track.languageCode)
-        );
+        const track = captionTracks.find(track => preferredLanguages.includes(track.languageCode));
 
         if (track) {
           const captionsResponse = await fetch(track.baseUrl);
@@ -79,24 +69,26 @@ const getCaptions = async (videoUrl, languageCode) => {
 };
 
 const extractTaskInformation = async (languageCode) => {
+  const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
+  const selectedText = await browser.tabs.executeScript(tab.id, { code: "(" + getSelectedText + ")();" });
+  const { textAction, noTextAction } = await browser.storage.local.get({
+    textAction: "translate",
+    noTextAction: "summarize"
+  });
+
   let actionType = "";
   let mediaType = "";
-  let taskInput = "";
-
-  const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
-
-  taskInput = await browser.tabs.executeScript(tab.id, { code: "(" + getSelectedText + ")();" });
-  taskInput = taskInput[0];
+  let taskInput = selectedText[0];
 
   if (taskInput) {
-    actionType = (await browser.storage.local.get({ textAction: "translate" })).textAction;
+    actionType = textAction;
     mediaType = "text";
   } else {
-    actionType = (await browser.storage.local.get({ noTextAction: "summarize" })).noTextAction;
+    actionType = noTextAction;
 
     if (tab.url.startsWith("https://www.youtube.com/watch?v=")) {
       mediaType = "captions";
-      taskInput = await getCaptions(tab.url, languageCode);
+      taskInput = await fetchCaptions(tab.url, languageCode);
     }
 
     if (!taskInput) {
@@ -115,29 +107,20 @@ const extractTaskInformation = async (languageCode) => {
 };
 
 const getLoadingMessage = (actionType, mediaType) => {
-  let loadingMessage = "";
-
-  if (actionType === "summarize") {
-    if (mediaType === "captions") {
-      loadingMessage = browser.i18n.getMessage("popup_summarizing_captions");
-    } else if (mediaType === "image") {
-      loadingMessage = browser.i18n.getMessage("popup_summarizing_image");
-    } else {
-      loadingMessage = browser.i18n.getMessage("popup_summarizing");
+  const loadingMessages = {
+    summarize: {
+      captions: browser.i18n.getMessage("popup_summarizing_captions"),
+      image: browser.i18n.getMessage("popup_summarizing_image"),
+      text: browser.i18n.getMessage("popup_summarizing")
+    },
+    translate: {
+      captions: browser.i18n.getMessage("popup_translating_captions"),
+      image: browser.i18n.getMessage("popup_translating_image"),
+      text: browser.i18n.getMessage("popup_translating")
     }
-  } else if (actionType === "translate") {
-    if (mediaType === "captions") {
-      loadingMessage = browser.i18n.getMessage("popup_translating_captions");
-    } else if (mediaType === "image") {
-      loadingMessage = browser.i18n.getMessage("popup_translating_image");
-    } else {
-      loadingMessage = browser.i18n.getMessage("popup_translating");
-    }
-  } else {
-    loadingMessage = browser.i18n.getMessage("popup_processing");
-  }
+  };
 
-  return loadingMessage;
+  return loadingMessages[actionType]?.[mediaType] || browser.i18n.getMessage("popup_processing");
 };
 
 const displayLoadingMessage = (loadingMessage) => {
@@ -158,6 +141,7 @@ const displayLoadingMessage = (loadingMessage) => {
 const main = async (useCache) => {
   let displayIntervalId = 0;
   let content = "";
+
   contentIndex = (await browser.storage.local.get({ contentIndex: -1 })).contentIndex;
   contentIndex = (contentIndex + 1) % 10;
   await browser.storage.local.set({ contentIndex: contentIndex });
@@ -182,53 +166,29 @@ const main = async (useCache) => {
     } else {
       taskInputChunks = await browser.runtime.sendMessage({
         message: "chunk",
-        actionType: actionType,
-        mediaType: mediaType,
-        taskInput: taskInput,
-        languageModel: languageModel
+        actionType,
+        mediaType,
+        taskInput,
+        languageModel
       });
-
-      console.log(taskInputChunks);
     }
 
     for (const taskInputChunk of taskInputChunks) {
       const taskCache = (await browser.storage.local.get({ taskCache: "" })).taskCache;
       let response = {};
 
-      if (useCache && taskCache === JSON.stringify({
-        actionType,
-        mediaType,
-        taskInput: taskInputChunk,
-        languageModel,
-        languageCode
-      })) {
+      if (useCache && taskCache === JSON.stringify({ actionType, mediaType, taskInput: taskInputChunk, languageModel, languageCode })) {
         response = (await browser.storage.local.get({ responseCache: {} })).responseCache;
       } else {
         try {
           response = await browser.runtime.sendMessage({
             message: "generate",
-            actionType: actionType,
-            mediaType: mediaType,
+            actionType,
+            mediaType,
             taskInput: taskInputChunk,
-            languageModel: languageModel,
-            languageCode: languageCode
+            languageModel,
+            languageCode
           });
-
-          if (response && response.ok) {
-            if (response.body.candidates && response.body.candidates[0].content) {
-              content += `${response.body.candidates[0].content.parts[0].text}\n\n`;
-              const div = document.createElement("div");
-              div.textContent = content;
-              document.getElementById("content").innerHTML = marked.parse(div.innerHTML);
-              window.scrollTo(0, document.body.scrollHeight);
-            } else {
-              content = browser.i18n.getMessage("popup_unexpected_response");
-              break;
-            }
-          } else {
-            content = browser.i18n.getMessage("popup_miscellaneous_error");
-            break;
-          }
         } catch (error) {
           content = browser.i18n.getMessage("popup_miscellaneous_error");
           console.error("Error calling browser.runtime.sendMessage:", error);
@@ -237,6 +197,17 @@ const main = async (useCache) => {
       }
 
       console.log(response);
+
+      if (response.ok && response.body.candidates && response.body.candidates[0].content) {
+        content += `${response.body.candidates[0].content.parts[0].text}\n\n`;
+        const div = document.createElement("div");
+        div.textContent = content;
+        document.getElementById("content").innerHTML = marked.parse(div.innerHTML);
+        window.scrollTo(0, document.body.scrollHeight);
+      } else {
+        content = response.ok ? browser.i18n.getMessage("popup_unexpected_response") : browser.i18n.getMessage("popup_miscellaneous_error");
+        break;
+      }
     }
   } catch (error) {
     content = browser.i18n.getMessage("popup_miscellaneous_error");
@@ -269,7 +240,11 @@ const initialize = async () => {
     element.textContent = browser.i18n.getMessage(element.getAttribute("data-i18n"));
   });
 
-  const { languageModel, languageCode } = await browser.storage.local.get({ languageModel: "1.5-flash", languageCode: "en" });
+  const { languageModel, languageCode } = await browser.storage.local.get({
+    languageModel: "1.5-flash",
+    languageCode: "en"
+  });
+
   document.getElementById("languageModel").value = languageModel;
   document.getElementById("languageCode").value = languageCode;
 
@@ -278,9 +253,7 @@ const initialize = async () => {
 
 document.addEventListener("DOMContentLoaded", initialize);
 
-document.getElementById("run").addEventListener("click", () => {
-  main(false);
-});
+document.getElementById("run").addEventListener("click", () => main(false));
 
 document.getElementById("results").addEventListener("click", () => {
   browser.tabs.create({ url: browser.runtime.getURL(`results.html?i=${contentIndex}`) });

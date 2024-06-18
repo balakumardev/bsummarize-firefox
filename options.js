@@ -1,5 +1,14 @@
 const restoreOptions = async () => {
-  const options = await browser.storage.local.get({
+  const {
+    apiKey,
+    languageModel,
+    languageCode,
+    noTextAction,
+    noTextCustomPrompt,
+    textAction,
+    textCustomPrompt,
+    ollamaModel
+  } = await browser.storage.local.get({
     apiKey: "",
     languageModel: "1.5-flash",
     languageCode: "en",
@@ -10,14 +19,14 @@ const restoreOptions = async () => {
     ollamaModel: "llama3"
   });
 
-  document.getElementById("apiKey").value = options.apiKey;
-  document.getElementById("languageModel").value = options.languageModel;
-  document.getElementById("languageCode").value = options.languageCode;
-  document.querySelector(`input[name="noTextAction"][value="${options.noTextAction}"]`).checked = true;
-  document.getElementById("noTextCustomPrompt").value = options.noTextCustomPrompt;
-  document.querySelector(`input[name="textAction"][value="${options.textAction}"]`).checked = true;
-  document.getElementById("textCustomPrompt").value = options.textCustomPrompt;
-  document.getElementById("ollamaModel").value = options.ollamaModel;
+  document.getElementById("apiKey").value = apiKey;
+  document.getElementById("languageModel").value = languageModel;
+  document.getElementById("languageCode").value = languageCode;
+  document.querySelector(`input[name="noTextAction"][value="${noTextAction}"]`).checked = true;
+  document.getElementById("noTextCustomPrompt").value = noTextCustomPrompt;
+  document.querySelector(`input[name="textAction"][value="${textAction}"]`).checked = true;
+  document.getElementById("textCustomPrompt").value = textCustomPrompt;
+  document.getElementById("ollamaModel").value = ollamaModel;
 };
 
 const saveOptions = async () => {
@@ -34,6 +43,7 @@ const saveOptions = async () => {
 
   await browser.storage.local.set(options);
   await browser.storage.session.set({ taskCache: "", responseCache: {} });
+
   const status = document.getElementById("status");
   status.textContent = browser.i18n.getMessage("options_saved");
   setTimeout(() => status.textContent = "", 1000);

@@ -35,21 +35,15 @@ const getSystemPrompt = async (actionType, mediaType, languageCode, taskInputLen
 
   if (actionType === "summarize") {
     if (mediaType === "image") {
-      systemPrompt = "Summarize the image as Markdown numbered list " +
-          `in ${languageNames[languageCode]} and reply only with the list.\n` +
-          "Format:\n1. First point.\n2. Second point.\n3. Third point.";
+      systemPrompt = `Summarize the image as Markdown numbered list in ${languageNames[languageCode]} and reply only with the list.\nFormat:\n1. First point.\n2. Second point.\n3. Third point.`;
     } else {
-      systemPrompt = `Summarize the entire text as up to ${numItems}-item Markdown numbered list ` +
-          `in ${languageNames[languageCode]} and reply only with the list.\n` +
-          "Format:\n1. First point.\n2. Second point.\n3. Third point.";
+      systemPrompt = `Summarize the entire text as up to ${numItems}-item Markdown numbered list in ${languageNames[languageCode]} and reply only with the list.\nFormat:\n1. First point.\n2. Second point.\n3. Third point.`;
     }
   } else if (actionType === "translate") {
     if (mediaType === "image") {
-      systemPrompt = `Translate the image into ${languageNames[languageCode]} ` +
-          "and reply only with the translated result.";
+      systemPrompt = `Translate the image into ${languageNames[languageCode]} and reply only with the translated result.`;
     } else {
-      systemPrompt = `Translate the entire text into ${languageNames[languageCode]} ` +
-          "and reply only with the translated result.";
+      systemPrompt = `Translate the entire text into ${languageNames[languageCode]} and reply only with the translated result.`;
     }
   } else if (actionType === "noTextCustom") {
     systemPrompt = (await browser.storage.local.get({ noTextCustomPrompt: "" })).noTextCustomPrompt;
@@ -85,40 +79,37 @@ const getCharacterLimit = (modelId, actionType) => {
   return characterLimits[modelId]?.[actionType] || 2048;
 };
 
-
 const chunkText = (text, chunkSize) => {
   const chunks = [];
-  // ।: U+0964 Devanagari Danda
   const sentenceBreaks = ["\n\n", "।", "。", "．", ".", "\n", " "];
   let remainingText = text.replace(/\r\n?/g, "\n");
 
   while (remainingText.length > chunkSize) {
     const currentChunk = remainingText.substring(0, chunkSize);
-    let index = -1;
+    let breakIndex = -1;
 
-    // Look for sentence breaks at 80% of the chunk size or later
     for (const sentenceBreak of sentenceBreaks) {
-      index = currentChunk.indexOf(sentenceBreak, Math.floor(chunkSize * 0.8));
+      breakIndex = currentChunk.indexOf(sentenceBreak, Math.floor(chunkSize * 0.8));
 
-      if (index !== -1) {
-        index += sentenceBreak.length;
+      if (breakIndex !== -1) {
+        breakIndex += sentenceBreak.length;
         break;
       }
     }
 
-    if (index === -1) {
-      index = chunkSize;
+    if (breakIndex === -1) {
+      breakIndex = chunkSize;
     }
 
-    chunks.push(remainingText.substring(0, index));
-    remainingText = remainingText.substring(index);
+    chunks.push(remainingText.substring(0, breakIndex));
+    remainingText = remainingText.substring(breakIndex);
   }
 
   chunks.push(remainingText);
   return chunks;
 };
 
-const tryJsonParse = (text) => {
+const tryParseJson = (text) => {
   try {
     return JSON.parse(text);
   } catch {
@@ -129,7 +120,6 @@ const tryJsonParse = (text) => {
 browser.runtime.onMessage.addListener((request, _sender, sendResponse) => {
   (async () => {
     if (request.message === "chunk") {
-      // Split the task input
       const { actionType, mediaType, taskInput, languageModel } = request;
       const modelId = await getModelId(languageModel, mediaType);
       const chunkSize = getCharacterLimit(modelId, actionType);
@@ -140,7 +130,6 @@ browser.runtime.onMessage.addListener((request, _sender, sendResponse) => {
       const { actionType, mediaType, taskInput, languageModel, languageCode } = request;
 
       if (languageModel === "ollama") {
-        // Call the Ollama API
         const { ollamaModel } = await browser.storage.local.get({ ollamaModel: "llama3" });
 
         try {
@@ -192,16 +181,9 @@ browser.runtime.onMessage.addListener((request, _sender, sendResponse) => {
           });
         }
       } else {
-        // Call the Gemini API
         const { apiKey } = await browser.storage.local.get({ apiKey: "" });
         const modelId = await getModelId(languageModel, mediaType);
-
-        const systemPrompt = await getSystemPrompt(
-            actionType,
-            mediaType,
-            languageCode,
-            taskInput.length
-        );
+        const systemPrompt = await getSystemPrompt(actionType, mediaType, languageCode, taskInput.length);
 
         let contents = [];
 
@@ -223,7 +205,7 @@ browser.runtime.onMessage.addListener((request, _sender, sendResponse) => {
         } else {
           contents.push({
             role: "user",
-            parts: [{ text: systemPrompt + "\nText:\n" + taskInput }]
+            parts: [{ text: `${systemPrompt}\nText:\n${taskInput}` }]
           });
         }
 
@@ -235,30 +217,20 @@ browser.runtime.onMessage.addListener((request, _sender, sendResponse) => {
               "x-goog-api-key": apiKey,
             },
             body: JSON.stringify({
-              contents: contents,
-              safetySettings: [{
-                category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-                threshold: "BLOCK_NONE"
-              },
-                {
-                  category: "HARM_CATEGORY_HATE_SPEECH",
-                  threshold: "BLOCK_NONE"
-                },
-                {
-                  category: "HARM_CATEGORY_HARASSMENT",
-                  threshold: "BLOCK_NONE"
-                },
-                {
-                  category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-                  threshold: "BLOCK_NONE"
-                }]
+              contents,
+              safetySettings: [
+                { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+                { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+                { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+                { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
+              ]
             })
           });
 
           const responseData = {
             ok: response.ok,
             status: response.status,
-            body: tryJsonParse(await response.text())
+            body: tryParseJson(await response.text())
           };
 
           if (response.ok) {
