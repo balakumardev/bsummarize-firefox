@@ -21,6 +21,9 @@ jobs:
       - name: Install web-ext
         run: npm install --global web-ext
 
+      - name: Install GitHub CLI
+        run: sudo apt-get install -y gh
+
       - name: Read version from manifest
         id: read_version
         run: |
@@ -32,25 +35,10 @@ jobs:
           web-ext build --overwrite-dest --source-dir . --artifacts-dir ./artifacts
 
       - name: Create GitHub Release
-        id: create_release
-        uses: actions/create-release@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ env.version }}
-          release_name: Release v${{ env.version }}
-          draft: false
-          prerelease: false
-
-      - name: Upload Extension File
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/*.xpi
-          asset_name: extension-${{ env.version }}.xpi
-          asset_content_type: application/x-xpinstall
+        run: |
+          gh release create v${{ env.version }} ./artifacts/*.xpi --title "Release v${{ env.version }}"
 
       - name: Bump version
         id: bump_version
