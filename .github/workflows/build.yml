@@ -1,83 +1,37 @@
-name: Build and Release BSummarize
+name: Build Firefox Extension
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  build-and-package:
+
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
-
-      - name: Set up Node.js 20
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-
-      - name: Install Dependencies
-        run: npm install
-        working-directory: ./
-
-      - name: Install web-ext
-        run: npm install -g web-ext
-
-      - name: Get Current Version
-        id: get-current-version
+      - name: Get manifest version
+        id: manifest
         run: |
-          echo "::set-output name=version::$(jq -r '.version' manifest.json)"
-        working-directory: ./
+          version=$(jq -r '.version' manifest.json)
+          echo "version=$version" >> $GITHUB_OUTPUT
 
-      - name: Increment Version
-        id: increment-version
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const manifest = require('./manifest.json');
-            const currentVersion = manifest.version;
-            const versionParts = currentVersion.split('.');
-            versionParts[2] = parseInt(versionParts[2], 10) + 1;
-            const newVersion = versionParts.join('.');
-            core.setOutput('new-version', newVersion);
-
-      - name: Update Manifest Version
+      - name: Build extension
         run: |
-          echo "New version: ${{ steps.increment-version.outputs.new-version }}"
-          jq --arg newVersion "${{ steps.increment-version.outputs.new-version }}" '.version = $newVersion' manifest.json > manifest.tmp.json && mv manifest.tmp.json manifest.json
-        working-directory: ./
-
-      - name: Package Extension
-        run: web-ext build
-        working-directory: ./
-
-      - name: Upload Extension Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: bsummarize-extension
-          path: ./web-ext-artifacts/*.xpi
-
-  create-release:
-    needs: build-and-package
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download Extension Artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: bsummarize-extension
+          zip -r extension.xpi * -x '*.git*'
 
       - name: Create Release
-        id: create-release
+        id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ needs.build-and-package.outputs.new-version }}
-          release_name: BSummarize Release v${{ needs.build-and-package.outputs.new-version }}
+          tag_name: v${{ steps.manifest.outputs.version }}
+          release_name: Release v${{ steps.manifest.outputs.version }}
           draft: false
           prerelease: false
 
@@ -86,7 +40,20 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create-release.outputs.upload_url }}
-          asset_path: ./*.xpi
-          asset_name: bsummarize-${{ needs.build-and-package.outputs.new-version }}.xpi
-          asset_content_type: application/x-xpinstall
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./extension.xpi
+          asset_name: extension-v${{ steps.manifest.outputs.version }}.xpi
+          asset_content_type: application/zip
+
+      - name: Increment manifest version
+        run: |
+          version=$(jq -r '.version' manifest.json)
+          major=$(echo $version | cut -d'.' -f1) 
+          minor=$(echo $version | cut -d'.' -f2)
+          patch=$(($(echo $version | cut -d'.' -f3) + 1))
+          new_version="$major.$minor.$patch"
+          jq --arg version "$new_version" '.version = $version' manifest.json > tmp && mv tmp manifest.json
+
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Bump manifest version to ${{ steps.manifest.outputs.version }}
