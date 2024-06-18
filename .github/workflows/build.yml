@@ -21,7 +21,7 @@ jobs:
           node-version: '18'
 
       - name: Install Dependencies (if any)
-        run: npm install # Uncomment if you add NPM dependencies
+        run: npm install
         working-directory: ./
 
       - name: Get Current Version
