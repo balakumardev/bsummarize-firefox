@@ -1,62 +1,89 @@
-name: Build Extension
+name: Build and Release BSummarize
 
 on:
   push:
-    branches: [ main ]
-  workflow_dispatch:
-    inputs:
-      create_release:
-        description: 'Create a new release'
-        required: true
-        default: 'false'
+    branches:
+      - main
 
 jobs:
-  build:
+  build-and-package:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-      - name: Increment version number
-        if: github.event.inputs.create_release == 'true'
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Dependencies (if any)
+        run: npm install # Uncomment if you add NPM dependencies
+        working-directory: ./
+
+      - name: Get Current Version
+        id: get-current-version
         run: |
-          current_version=$(grep -oP '(?<="version": ")[^"]*' manifest.json)
-          new_version=$(echo $current_version | awk -F. '/[0-9]+\./{$NF++;print}' OFS=.)
-          sed -i "s/\"version\": \"$current_version\"/\"version\": \"$new_version\"/" manifest.json
-          echo "NEW_VERSION=$new_version" >> $GITHUB_ENV
+          echo "::set-output name=version::$(jq -r '.version' manifest.json)"
+        working-directory: ./
 
-      - name: Commit version update
-        if: github.event.inputs.create_release == 'true'
+      - name: Increment Version
+        id: increment-version
+        uses: ashley-taylor/read-json-property-action@v1
+        with:
+          path: ./manifest.json
+          property: version
+
+      - name: Update Manifest Version
         run: |
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
-          git add manifest.json
-          git commit -m "Bump version to ${{ env.NEW_VERSION }}"
-          git push
+          echo "New version: ${{ steps.increment-version.outputs.value }}"
+          jq --arg newVersion "${{ steps.increment-version.outputs.value }}" '.version = $newVersion' manifest.json > manifest.tmp.json && mv manifest.tmp.json manifest.json
+        working-directory: ./
 
-      - name: Build extension
-        run: |
-          zip -r bsummarize.xpi *
+      - name: Package Extension
+        uses: mozilla/web-ext@v2
+        with:
+          sourceDir: ./
+          artifactsDir: ./artifacts
+          overwriteDest: true
 
-      - name: Create release
-        if: github.event.inputs.create_release == 'true'
-        id: create_release
+      - name: Upload Extension Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: bsummarize-extension
+          path: ./artifacts/*.xpi
+
+  create-release:
+    needs: build-and-package
+    runs-on: ubuntu-latest
+    permissions:
+      releases: write
+    steps:
+      - name: Download Extension Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: bsummarize-extension
+
+      - name: Create Release
+        id: create-release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ env.NEW_VERSION }}
-          release_name: Release v${{ env.NEW_VERSION }}
+          tag_name: v${{ steps.increment-version.outputs.value }}
+          release_name: BSummarize Release v${{ steps.increment-version.outputs.value }}
           draft: false
           prerelease: false
 
-      - name: Upload release asset
-        if: github.event.inputs.create_release == 'true'
+      - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: bsummarize.xpi
-          asset_name: bsummarize-v${{ env.NEW_VERSION }}.xpi
-          asset_content_type: application/zip
+          asset_path: ./artifacts/*.xpi
+          asset_name: bsummarize-${{ steps.increment-version.outputs.value }}.xpi
+          asset_content_type: application/x-xpinstall
