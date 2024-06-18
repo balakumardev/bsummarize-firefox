@@ -3,11 +3,13 @@
 
 Effortlessly grasp web content with the power of AI! 🪄
 
-[![Firefox Add-on](https://img.shields.io/amo/v/YOUR_EXTENSION_ID?label=Get%20it%20on%20Firefox&style=for-the-badge)](https://addons.mozilla.org/firefox/addon/YOUR_EXTENSION_ID)
+[![Firefox Add-on](https://img.shields.io/amo/v/YOUR_EXTENSION_ID?label=Get%20it%20on%20Firefox&style=for-the-badge)](https://addons.mozilla.org/firefox/addon/YOUR_EXTENSION_ID) 
 
 **Tired of endlessly scrolling through lengthy articles? Struggle to comprehend content in other languages?**
 
 BSummarize is your solution! Our powerful Firefox extension allows you to quickly **summarize and translate** web pages, including YouTube videos, using cutting-edge language models from **Google Gemini and Ollama**.
+
+![BSummarize](img/bsummarize.gif)
 
 ## ✨ Key Features
 
