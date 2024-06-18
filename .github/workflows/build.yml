@@ -6,13 +6,59 @@ on:
       - main
 
 jobs:
-  build-and-package:
-  # ... (this job remains unchanged)
+  build-and-package:  # Correctly define the job
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies (if any)
+        run: npm install
+        working-directory: ./
+
+      - name: Get Current Version
+        id: get-current-version
+        run: |
+          echo "::set-output name=version::$(jq -r '.version' manifest.json)"
+        working-directory: ./
+
+      - name: Increment Version
+        id: increment-version
+        uses: ashley-taylor/read-json-property-action@v1
+        with:
+          path: ./manifest.json
+          property: version
+
+      - name: Update Manifest Version
+        run: |
+          echo "New version: ${{ steps.increment-version.outputs.value }}"
+          jq --arg newVersion "${{ steps.increment-version.outputs.value }}" '.version = $newVersion' manifest.json > manifest.tmp.json && mv manifest.tmp.json manifest.json
+        working-directory: ./
+
+      - name: Package Extension
+        uses: mozilla/web-ext@v2
+        with:
+          sourceDir: ./
+          artifactsDir: ./artifacts
+          overwriteDest: true
+
+      - name: Upload Extension Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: bsummarize-extension
+          path: ./artifacts/*.xpi
 
   create-release:
     needs: build-and-package
     runs-on: ubuntu-latest
-    # No need for permissions block here anymore!
     steps:
       - name: Download Extension Artifact
         uses: actions/download-artifact@v3
