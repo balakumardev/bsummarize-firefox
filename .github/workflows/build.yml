@@ -73,6 +73,7 @@ jobs:
             --channel=unlisted \
             --api-key="${{ secrets.API_KEY }}" \
             --api-secret="${{ secrets.API_SECRET }}"
+          mv ./web-ext-artifacts/*.xpi ./web-ext-artifacts/bsummarize.xpi
         env:
           API_KEY: ${{ secrets.API_KEY }}
           API_SECRET: ${{ secrets.API_SECRET }}
