@@ -52,7 +52,7 @@ jobs:
         working-directory: ./
 
       - name: Package Extension
-        run: web-ext build
+        run: web-ext build --overwrite-dest --filename=bsummarize.xpi
         working-directory: ./
 
       - name: Upload Extension Artifact
