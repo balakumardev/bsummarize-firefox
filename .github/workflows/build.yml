@@ -1,4 +1,4 @@
-name: Build and Release BSummarize
+name: Build and Release Firefox Extension
 
 on:
   push:
@@ -6,82 +6,57 @@ on:
       - main
 
 jobs:
-  build-and-package:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
-
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '16'
 
-      - name: Install Dependencies (if any)
-        run: npm install
-        working-directory: ./
+      - name: Install zip utility
+        run: sudo apt-get install zip -y
 
-      - name: Get Current Version
-        id: get-current-version
+      - name: Read version from manifest
+        id: read_version
         run: |
-          echo "::set-output name=version::$(jq -r '.version' manifest.json)"
-        working-directory: ./
+          version=$(jq -r '.version' manifest.json)
+          echo "::set-output name=version::$version"
 
-      - name: Increment Version
-        id: increment-version
-        uses: ashley-taylor/read-json-property-action@v1
-        with:
-          path: ./manifest.json
-          property: version
-
-      - name: Update Manifest Version
+      - name: Package extension
         run: |
-          echo "New version: ${{ steps.increment-version.outputs.value }}"
-          jq --arg newVersion "${{ steps.increment-version.outputs.value }}" '.version = $newVersion' manifest.json > manifest.tmp.json && mv manifest.tmp.json manifest.json
-        working-directory: ./
+          zip -r firefox-extension.zip . -x '*.git*'
 
-      - name: Package Extension
-        uses: mozilla/web-ext@v2
-        with:
-          sourceDir: ./
-          artifactsDir: ./artifacts
-          overwriteDest: true
-
-      - name: Upload Extension Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: bsummarize-extension
-          path: ./artifacts/*.xpi
-
-  create-release:
-    needs: build-and-package
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download Extension Artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: bsummarize-extension
-
-      - name: Create Release
-        id: create-release
+      - name: Create GitHub Release
+        id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ steps.increment-version.outputs.value }}
-          release_name: BSummarize Release v${{ steps.increment-version.outputs.value }}
+          tag_name: v${{ steps.read_version.outputs.version }}
+          release_name: Release v${{ steps.read_version.outputs.version }}
           draft: false
           prerelease: false
+          files: firefox-extension.zip
 
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/*.xpi
-          asset_name: bsummarize-${{ steps.increment-version.outputs.value }}.xpi
-          asset_content_type: application/x-xpinstall
+      - name: Bump version
+        id: bump_version
+        run: |
+          current_version=${{ steps.read_version.outputs.version }}
+          IFS="." read -a version_parts <<< "$current_version"
+          version_parts[2]=$((version_parts[2] + 1))
+          new_version="${version_parts[0]}.${version_parts[1]}.${version_parts[2]}"
+          jq --arg new_version "$new_version" '.version = $new_version' manifest.json > manifest_tmp.json
+          mv manifest_tmp.json manifest.json
+
+      - name: Commit updated manifest
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git add manifest.json
+          git commit -m "Bump version to $new_version"
+          git push origin main
