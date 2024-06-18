@@ -111,4 +111,5 @@ jobs:
           draft: false
           prerelease: false
           files: ./web-ext-artifacts/bsummarize.xpi
+          generate_release_notes: true
           token: ${{ secrets.TOKEN }}
