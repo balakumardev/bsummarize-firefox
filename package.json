@@ -1,0 +1,11 @@
+{
+  "name": "bsummarize",
+  "version": "1.0.0",
+  "description": "Firefox extension for summarization and translation",
+  "main": "popup.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Bala Kumar",
+  "license": "ISC"
+}
