@@ -72,8 +72,7 @@ jobs:
           web-ext sign \
             --channel=unlisted \
             --api-key="${{ secrets.API_KEY }}" \
-            --api-secret="${{ secrets.API_SECRET }}" \
-            bsummarize.xpi
+            --api-secret="${{ secrets.API_SECRET }}"
         env:
           API_KEY: ${{ secrets.API_KEY }}
           API_SECRET: ${{ secrets.API_SECRET }}
