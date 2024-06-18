@@ -32,5 +32,10 @@
         "lib/Readability.min.js"
       ]
     }
-  ]
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{6f12f06d-8464-4580-be5a-e4317d323d49}"
+    }
+  }
 }

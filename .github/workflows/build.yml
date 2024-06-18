@@ -64,8 +64,19 @@ jobs:
         working-directory: ./
 
       - name: Package Extension
-        run: web-ext build --overwrite-dest --filename=bsummarize.xpi --verbose
+        run: web-ext build --overwrite-dest --filename=bsummarize.zip --verbose
         working-directory: ./
+
+      - name: Sign extension
+        run: |
+          web-ext sign \
+            --channel=unlisted \
+            --api-key="${{ secrets.API_KEY }}" \
+            --api-secret="${{ secrets.API_SECRET }}" \
+            bsummarize.xpi
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
+          API_SECRET: ${{ secrets.API_SECRET }}
 
       - name: Save Version to File
         run: echo "${{ steps.increment-version.outputs.new-version }}" > new_version.txt
