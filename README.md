@@ -1,66 +1,103 @@
-# BSummarize - Firefox Extension:  Effortlessly Grasp Web Content 🪄
 
-**Tired of long articles? Struggle to understand content in other languages?**
+# BSummarize - Firefox Extension 🦊
 
-**BSummarize** is a powerful Firefox extension that lets you quickly summarize and translate web pages, including YouTube videos, using cutting-edge language models. **Get the key points instantly – all for free!**
+Effortlessly grasp web content with the power of AI! 🪄
 
-<br/> 
+[![Firefox Add-on](https://img.shields.io/amo/v/YOUR_EXTENSION_ID?label=Get%20it%20on%20Firefox&style=for-the-badge)](https://addons.mozilla.org/firefox/addon/YOUR_EXTENSION_ID)
+
+**Tired of endlessly scrolling through lengthy articles? Struggle to comprehend content in other languages?**
+
+BSummarize is your solution! Our powerful Firefox extension allows you to quickly **summarize and translate** web pages, including YouTube videos, using cutting-edge language models from **Google Gemini and Ollama**.
 
 ## ✨ Key Features
 
-- **Summarize Entire Pages:**
-   - Click the BSummarize icon, and get a concise summary of the entire web page!
-- **Summarize Selected Text:**
-   - Highlight any text on a page and get a focused summary of just that section.
-- **Multi-Language Summaries:**
-   - Choose your target language, and get summaries tailored to your needs.
-- **Accurate Translations:**
-   - Translate entire web pages or selected text into your preferred language.
-- **Effortless YouTube Summaries:**
-   -  Automatically detect and summarize YouTube video captions!
-- **Chunking for Long Pages:**
-   - BSummarize intelligently handles long articles and web pages for efficient processing.
+* **Summarize Entire Pages:** Get a concise summary with a single click!
 
-<br/> 
+* **Summarize Selected Text:** Highlight specific passages for focused summaries.
+  
+* **Multi-Language Support:** Summarize and translate into your preferred language.
+  
+* **Effortless YouTube Summaries:** Automatically detect and summarize video captions.
+  
+* **Handles Long Content:** Intelligent chunking for efficient processing of large articles.
 
-## 🚀  Supercharge Your Browsing Experience:
+## 🚀 Benefits
 
-- **Save Time:** Get the gist of articles and web pages in seconds.
-- **Boost Comprehension:**  Understand complex content more easily.
-- **Break Language Barriers:**  Access information in any language.
-
-<br/> 
+* **Save Time:** Extract key information in seconds. ⏳
+* **Boost Comprehension:** Understand complex topics with ease. 🧠
+* **Break Language Barriers:** Access content in any language. 🌐
 
 ## ⬇️ Installation
 
-1. **Download:**  Download the latest `.xpi` file from [link to your releases page].
-2. **Open Firefox:**  Open Firefox and type `about:debugging` in the address bar and press Enter.
-3. **Enable Add-on Debugging:** Select "This Firefox" on the left-hand side.
-4. **Load Temporary Add-on:** Click "Load Temporary Add-on" and select the downloaded `.xpi` file.
-5. **Confirmation:** You should see a confirmation message that the add-on was successfully loaded. The BSummarize icon will appear in your Firefox toolbar.
+1. **Download:** Head over to the latest release page: [link to your releases page].
+2. **Open in Firefox:** Click on the `.xpi` file for the latest version.
+3. **Confirm Installation:** Click "Add" when Firefox prompts you.
+4. **Get Started!** The BSummarize icon will appear in your toolbar.
 
-<br/>
+##  ➡️ How to Use
 
-##  ➡️  Usage
+1. **Go to a Webpage:** Visit any website you'd like to summarize or translate.
+2. **Click the Icon:**
+    * **Entire Page:** Click the BSummarize icon without selecting any text.
+    * **Specific Text:** Highlight the desired text, then click the icon.
+3. **View Results:** The summary or translation appears in a popup. Click "View Results" for a full-screen view.
 
-1. **Navigate to a Webpage:** Go to the web page you want to summarize or translate.
-2. **Click the Icon (No Text Selected):**
-   - To summarize or translate the **entire page**, simply click the BSummarize icon in your toolbar.
-3. **Select Text & Click:**
-   - To summarize or translate a **specific part of the page**, first **highlight the desired text**.
-   - Then, click the BSummarize icon.
-4. **View Results:**
-   - The summary or translation will appear in the extension's popup.
-   - Click "View Results" to see the full output in a new tab.
-5. **On YouTube:**
-   - BSummarize will automatically detect YouTube video pages.
-   - Click the icon to summarize or translate the video captions.
+## 🧠 Choose Your Language Model
 
-<br/>
+BSummarize offers flexibility with support for both Google Gemini and Ollama.
 
-## ⚙️  Options
+* **Google Gemini:** Often faster and more powerful. Requires a free API key.
+* **Ollama:** Runs locally on your computer; no API key needed. Requires installation.
 
-- **Language Model:**  Choose from Gemini (requires an API Key from Google AI) or Ollama (runs locally).
-- **Target Language:**  Select the language for your summaries and translations.
-- **Custom Actions:**  Define your own actions for summarizing and translating text.
-- **Access Settings:** Click "Extension Settings" in the popup to customize these options.
+### 🗝️ Getting a Google Gemini API Key
+
+1. Visit the Google AI for Developers website: [https://ai.google.dev](https://ai.google.dev/)
+2. Sign in with your Google Account.
+3. Create a new project and enable the "Gemini API."
+4. Generate an API key and paste it into BSummarize's options.
+
+### 🚀 Installing Ollama & Enabling CORS
+
+1. **Install Ollama:** Follow the instructions for your operating system: [https://ollama.ai/](https://ollama.ai/)
+
+2. **Enable CORS:** This is crucial for BSummarize to communicate with Ollama.
+
+   **macOS:**
+
+   ```bash
+   launchctl setenv OLLAMA_ORIGINS "*"
+   ```
+
+   **Linux (using systemd):**
+
+    * Edit the Ollama service file:
+      ```bash
+      sudo systemctl edit ollama.service
+      ```
+    * Add this line under the `[Service]` section:
+      ```
+      Environment="OLLAMA_ORIGINS=*"
+      ```
+    * Reload and restart Ollama:
+      ```bash
+      sudo systemctl daemon-reload
+      sudo systemctl restart ollama.service
+      ```
+
+   **Windows:**
+
+    1. Make sure Ollama is closed.
+    2. Open: **Control Panel > System and Security > System**.
+    3. Click "Advanced system settings" > "Environment Variables."
+    4. Create a new system variable:
+        * Variable name: `OLLAMA_ORIGINS`
+        * Variable value: `*`
+    5. Restart your computer.
+
+## 🔐 Security
+
+We take your privacy seriously! BSummarize does not store your API keys or the content you process on any external servers. All processing happens locally on your device.
+
+---
+
+**Enjoy BSummarize!** If you have any questions or need help, feel free to [open an issue on GitHub](link-to-your-github-issues). 
