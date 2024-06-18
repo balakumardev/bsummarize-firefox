@@ -18,8 +18,8 @@ jobs:
         with:
           node-version: '16'
 
-      - name: Install zip utility
-        run: sudo apt-get install zip -y
+      - name: Install web-ext
+        run: npm install --global web-ext
 
       - name: Read version from manifest
         id: read_version
@@ -27,9 +27,9 @@ jobs:
           version=$(jq -r '.version' manifest.json)
           echo "::set-output name=version::$version"
 
-      - name: Package extension
+      - name: Package extension (xpi)
         run: |
-          zip -r firefox-extension.zip . -x '*.git*'
+          web-ext build --overwrite-dest --source-dir . --artifacts-dir ./artifacts
 
       - name: Create GitHub Release
         id: create_release
@@ -41,7 +41,7 @@ jobs:
           release_name: Release v${{ steps.read_version.outputs.version }}
           draft: false
           prerelease: false
-          files: firefox-extension.zip
+          files: ./artifacts/*.xpi
 
       - name: Bump version
         id: bump_version
